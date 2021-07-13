@@ -23,14 +23,17 @@ impl<T: Float> Scene<T> {
 
     pub fn color(&self, ray: &Ray<T>) -> Vec3<T> where f64: Into<T> {
         for object in &self.objects {
-            let state = match object {
-                Objects::Sphere(sphere) => { sphere.hit(ray) },
-                _ => false, 
+            match object {
+                Objects::Sphere(sphere) => { 
+                    if let Some(t) = sphere.hit(ray) {
+                        let point = ray.point_at_parameter(t) - sphere.center;
+
+                        return Vec3::new(point.x + 1.0.into(), point.y + 1.0.into(), point.z + 1.0.into()) * 0.5.into()
+                    }
+                },
+                // _ => false, 
             }; 
-            
-            if state {
-                return Vec3::new(1.0.into(), 0.0.into(), 0.0.into())
-            }
+    
         }
 
         let t = 0.5.into() * (ray.direction().y + 1.0.into());

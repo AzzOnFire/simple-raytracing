@@ -6,8 +6,8 @@ use num::Float;
 
 #[derive(Eq, PartialEq, Clone, Hash, Debug, Copy)]
 pub struct Sphere<T: Float> {
-    center: Vec3<T>,
-    radius: T,
+    pub center: Vec3<T>,
+    pub radius: T,
 }
 
 impl<T: Float> Sphere<T> {
@@ -15,7 +15,7 @@ impl<T: Float> Sphere<T> {
         Self { center: center, radius: radius }
     }
     
-    pub fn hit(&self, ray: &Ray<T>) -> bool where f64: Into<T> {
+    pub fn hit(&self, ray: &Ray<T>) -> Option<T> where f64: Into<T> {
         let difference = ray.origin().clone() - self.center;
 
         let a = ray.direction().dot(ray.direction()); 
@@ -24,7 +24,13 @@ impl<T: Float> Sphere<T> {
 
         let discriminant = b * b - 4.0.into() * a * c;
         
-        discriminant.is_sign_positive()
+        
+        if discriminant.is_sign_positive() {
+            let t = (-b - discriminant.sqrt()) / (2.0.into() * a);
+            Some(t)
+        } else {
+            None
+        }
     }
 }
 
