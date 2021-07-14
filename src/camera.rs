@@ -13,24 +13,25 @@ pub struct Camera<T: Float> {
 }
 
 impl<T: Float> Camera<T> {
-    pub fn new(/*origin: Vec3<T>, direction: Vec3<T>, */fov: T, aspect_ratio: T) -> Self where f64: Into<T> {
+    pub fn new(lookfrom: Vec3<T>, lookat: Vec3<T>, fov: T, aspect_ratio: T) -> Self where f64: Into<T> {
         let theta = fov.to_radians();
         let half_height = (theta / 2.0.into()).tan();
         let half_width = aspect_ratio * half_height;
 
-        // TODO camera rotation
-        /*let direction = *direction.normalize() * -1.0.into();
-        let world_up_direction = Vec3::new(0.0.into(), 0.0.into(), 1.0.into());*/
+        let w = *(lookfrom + lookat).normalize();
+        let vup = Vec3::new(0.0.into(), -1.0.into(), 0.0.into());
+        let u = *vup.cross(&w).normalize();
+        let v = w.cross(&u);
 
         Self { 
-            origin: Vec3::new(0.0.into(), 0.0.into(), 0.0.into()),
-            lower_left_corner: Vec3::new(-half_width, -half_height, -1.0.into()),
-            horizontal: Vec3::new(2.0.into() * half_width, 0.0.into(), 0.0.into()),
-            vertical: Vec3::new(0.0.into(), 2.0.into() * half_height, 0.0.into()),
+            origin: lookfrom,
+            lower_left_corner: lookfrom - u * half_width - v * half_height - w,
+            horizontal: u * 2.0.into() * half_width,
+            vertical: v * 2.0.into() * half_height,
         }
     }
 
     pub fn get_ray(&self, u: T, v: T) -> Ray<T> {
-        Ray::new(self.origin, self.lower_left_corner + self.horizontal * u + self.vertical * v)
+        Ray::new(self.origin, -(self.lower_left_corner + self.horizontal * u + self.vertical * v))
     }
 }

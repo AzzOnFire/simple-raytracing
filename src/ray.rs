@@ -9,6 +9,14 @@ pub struct Ray<T: Float> {
     direction: Vec3<T>,
 }
 
+#[derive(Eq, PartialEq, Clone, Hash, Debug, Copy)]
+pub struct Intersection<T: Float> {
+    pub t: T,
+    pub point: Vec3<T>,
+    pub normal: Vec3<T>,
+}
+
+
 impl<T: Float> Ray<T> {
     pub fn new(origin: Vec3<T>, mut direction: Vec3<T>) -> Ray<T> {
         Ray{origin: origin, direction: *(direction.normalize())}
